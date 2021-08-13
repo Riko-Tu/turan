@@ -1,0 +1,354 @@
+basePath: /api
+info:
+  contact:
+    email: support@bullteam.cn
+    name: API Support
+  description: Tefs 用户创建腾讯云环境
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Tefs 用户安装腾讯云 API
+  version: V0.1
+paths:
+  /cloudEnv/account:
+    get:
+      consumes:
+      - application/json
+      description: 获取腾讯云主账户id
+      parameters:
+      - description: 腾讯云SecretId
+        in: query
+        name: tencentCloudSecretId
+        required: true
+        type: string
+      - description: 腾讯云SecretKey
+        in: query
+        name: tencentCloudSecretKey
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"data":{"account":"100012471344"}}'
+          schema:
+            type: string
+      summary: 获取腾讯云账户id seq:3
+      tags:
+      - 腾讯云环境
+  /cloudEnv/account/verify:
+    get:
+      consumes:
+      - application/json
+      description: 腾讯云账户验证接口
+      parameters:
+      - description: 腾讯云SecretId
+        in: query
+        name: tencentCloudSecretId
+        required: true
+        type: string
+      - description: 腾讯云SecretKey
+        in: query
+        name: tencentCloudSecretKey
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"data":{"ok":true}}'
+          schema:
+            type: string
+      summary: 腾讯云账户验证
+      tags:
+      - 腾讯云环境
+  /cloudEnv/cos:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 创建腾讯云对象存储COS接口
+      parameters:
+      - description: 腾讯云AppId
+        in: formData
+        name: tencentAppId
+        required: true
+        type: string
+      - description: 腾讯云SecretId
+        in: formData
+        name: tencentCloudSecretId
+        required: true
+        type: string
+      - description: 腾讯云SecretKey
+        in: formData
+        name: tencentCloudSecretKey
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"data":{"cos_bucket_name":"tefs-cos-asd134s"}}'
+          schema:
+            type: string
+      summary: 创建腾讯云对象存储COS seq:7
+      tags:
+      - 腾讯云环境
+  /cloudEnv/project:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 创建腾讯云项目接口
+      parameters:
+      - description: 腾讯云SecretId
+        in: formData
+        name: tencentCloudSecretId
+        required: true
+        type: string
+      - description: 腾讯云SecretKey
+        in: formData
+        name: tencentCloudSecretKey
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"data":{"project_id": 1201126}}'
+          schema:
+            type: string
+      summary: 创建腾讯云项目 seq:2
+      tags:
+      - 腾讯云环境
+  /cloudEnv/region:
+    get:
+      consumes:
+      - application/json
+      description: 设置讯云地区信(region, zone)息接口
+      parameters:
+      - description: 腾讯云SecretId
+        in: query
+        name: tencentCloudSecretId
+        required: true
+        type: string
+      - description: 腾讯云SecretKey
+        in: query
+        name: tencentCloudSecretKey
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"data":{"region":"ap-nanjing","zone":"ap-nanjing-3"}}'
+          schema:
+            type: string
+      summary: 设置腾讯云地区信息 seq:1
+      tags:
+      - 腾讯云环境
+  /cloudEnv/securityGroup:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 创建腾讯云安全组接口
+      parameters:
+      - description: 腾讯云SecretId
+        in: formData
+        name: tencentCloudSecretId
+        required: true
+        type: string
+      - description: 腾讯云SecretKey
+        in: formData
+        name: tencentCloudSecretKey
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"data":{"security_group_id":"sg-hkzz4497"}}'
+          schema:
+            type: string
+      summary: 创建腾讯云安全组 seq:5
+      tags:
+      - 腾讯云环境
+  /cloudEnv/securityGroup/policies:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 腾讯云安全组添加开放访问规则接口
+      parameters:
+      - description: 腾讯云SecretId
+        in: formData
+        name: tencentCloudSecretId
+        required: true
+        type: string
+      - description: 腾讯云SecretKey
+        in: formData
+        name: tencentCloudSecretKey
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"data":{"ok":true}}'
+          schema:
+            type: string
+      summary: 腾讯云安全组添加开放访问规则 seq:6
+      tags:
+      - 腾讯云环境
+  /cloudEnv/tke:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 创建腾讯云TKE集群接口
+      parameters:
+      - description: 腾讯云SecretId
+        in: formData
+        name: tencentCloudSecretId
+        required: true
+        type: string
+      - description: 腾讯云SecretKey
+        in: formData
+        name: tencentCloudSecretKey
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"data":{"cluster_id":"tke-hb528v8v","instance_pass_word":"xxxxxxxxxxxx"}}'
+          schema:
+            type: string
+      summary: 创建腾讯云TKE集群 seq:8
+      tags:
+      - 腾讯云环境
+  /cloudEnv/tke/instance/publicIpAddress:
+    get:
+      consumes:
+      - application/json
+      description: 获取腾讯云TKE 实例公网ip地址接口
+      parameters:
+      - description: 腾讯云SecretId
+        in: query
+        name: tencentCloudSecretId
+        required: true
+        type: string
+      - description: 腾讯云SecretKey
+        in: query
+        name: tencentCloudSecretKey
+        required: true
+        type: string
+      - description: 腾讯云TKE的cvm实例id
+        in: query
+        name: instanceId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"data":{"public_ip_address":"127.0.0.1"}}'
+          schema:
+            type: string
+      summary: 获取腾讯云TKE 实例公网ip地址 seq:11
+      tags:
+      - 腾讯云环境
+  /cloudEnv/tke/instance/status:
+    get:
+      consumes:
+      - application/json
+      description: 获取腾讯云TKE cvm实例状态和id态接口 status=initializing(创建中) status=failed(创建异常) status=running(创建成功)
+      parameters:
+      - description: 腾讯云SecretId
+        in: query
+        name: tencentCloudSecretId
+        required: true
+        type: string
+      - description: 腾讯云SecretKey
+        in: query
+        name: tencentCloudSecretKey
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"data":{"status":"initializing","instance_id":"xxxxx"}}'
+          schema:
+            type: string
+      summary: 获取腾讯云TKE cvm实例状态和id seq:10
+      tags:
+      - 腾讯云环境
+  /cloudEnv/tke/status:
+    get:
+      consumes:
+      - application/json
+      description: 获取腾讯云TKE集群状态接口 status=Creating(创建中) status=Abnormal(创建异常) status=Running(创建成功)
+      parameters:
+      - description: 腾讯云SecretId
+        in: query
+        name: tencentCloudSecretId
+        required: true
+        type: string
+      - description: 腾讯云SecretKey
+        in: query
+        name: tencentCloudSecretKey
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"data":{"status":"Creating"}}'
+          schema:
+            type: string
+      summary: 获取腾讯云TKE集群状态 seq:9
+      tags:
+      - 腾讯云环境
+  /cloudEnv/version:
+    get:
+      description: 获取创建腾讯云应用程序版本接口
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"data":"1.0"}'
+          schema:
+            type: string
+      summary: 创建腾讯云应用程序版本
+      tags:
+      - 腾讯云环境
+  /cloudEnv/vpc:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 创建腾讯云私有网络和子网接口
+      parameters:
+      - description: 腾讯云SecretId
+        in: formData
+        name: tencentCloudSecretId
+        required: true
+        type: string
+      - description: 腾讯云SecretKey
+        in: formData
+        name: tencentCloudSecretKey
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"data":{"vpc_id":"vpc-hb528v8v", "subnet_id":"xxxxx"}}'
+          schema:
+            type: string
+      summary: 创建腾讯云私有网络 seq:4
+      tags:
+      - 腾讯云环境
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

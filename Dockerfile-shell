@@ -1,0 +1,12 @@
+FROM python:3.7
+
+WORKDIR /root
+COPY . /bin
+RUN chmod +x /bin/start.sh
+RUN chmod +x /bin/gotty
+RUN chmod +x /bin/tefs_file_server
+RUN apt-get update
+RUN apt-get install vim -y
+ENV TERM=xterm-256color
+
+CMD ["start.sh"]

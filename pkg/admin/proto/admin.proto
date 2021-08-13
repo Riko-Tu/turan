@@ -1,0 +1,968 @@
+// Copyright 2015 gRPC authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+option go_package = ".;admin";
+
+package admin;
+
+// 用户信息
+message User {
+  int64 id = 1;
+  // QQ/微信服务返回给我们的唯一标识
+  string account = 2;
+  // 登录方法：“qq” or "wx"
+  string way = 3;
+  string name = 4;
+  string email = 5;
+  string phone = 6;
+  int64  is_notify = 7; // 1=通知 2=不通知
+  int64  create_at = 8;
+  int64  update_at = 9;
+  int64  last_login_at = 10;
+}
+
+message CosCredential {
+  // COS服务返回的临时ID
+  string tmpSecretID = 1;
+  // COS服务返回的临时Key
+  string tmpSecretKey = 2;
+  // COS服务返回的Token
+  string sessionToken = 3;
+  // 存储桶名,不含子目录，不含http：//或者cos：// url
+  string bucket = 4;
+  string region = 5;
+  // ExpiredTime
+  int64 expired_time = 6;
+  // Expiration
+  string expiration = 7;
+  // StartTime
+  int64 start_time = 8;
+}
+
+// 后台系统配置。仅管理员查询修改。例如：邮件模板配置，邮件标题配置。管理员账户配置等。。
+message Setting {
+  int64 id = 1;
+  string title = 2;     // 配置key, 例：email_alias
+  string value = 3;     // 配置value, 例：腾讯量子实验室
+  string describe = 4;  // 描述说明信息，例：发送邮件时使用别名
+  int64  create_at = 5; // 创建时间
+  int64  update_at = 6; // 更新时间
+}
+
+// vasp license
+message License {
+  int64 id = 1;
+  // 对应User表里的ID
+  int64 user_id = 2;
+  // 所属机构
+  string organization = 3;
+  // 研究领域
+  string domain = 4;
+  // license 绑定邮箱
+  string bind_email = 5;
+  // 存储桶名加子目录，不含http:// 或 cos://
+  string cos_path = 6;
+  int64 status = 7; // 状态 1=待审核  | 2=失败 | 3=成功
+  int64  create_at = 8;
+  int64  update_at = 9;
+}
+
+// 腾讯云环境
+message CloudEnv {
+  int64 id = 1;
+  int64 user_id = 2;
+  int64 vasp_license_id = 3;
+  string cloud_secret_id = 4;
+  string cloud_app_id = 5;
+  string region = 6;
+  string zone = 7;
+  // 腾讯云主ID
+  string cloud_account_id = 8;
+  // 腾讯云项目ID（注：通过项目可以请求腾讯云主ID）
+  string cloud_project_id = 9;
+  string vpc_id = 10;
+  string subnet_id = 11;
+  string security_group_id = 12;
+  // 存储桶名
+  string cos_bucket = 13;
+  string cluster_id = 14;
+  string instance_id = 15;
+  string instance_ip = 16;
+  int64 status = 17;
+  // 创建服务
+  string err_msg = 18;
+  int64 create_at = 19;
+  int64 update_at = 20;
+}
+
+// 消息通知
+message Notify {
+  int64 id = 1;
+  int64 user_id = 2;
+  int64 notify_type = 3; // 通知类型 1=系统 | 2=请求 | 3=任务
+  int64 status = 4; // 状态 1=未读 | 2=已读
+  string content = 5; // 通知内容
+  int64 create_at = 6;
+  int64 update_at = 7;
+}
+
+// 项目
+message Project {
+  // id
+  int64 id = 1;
+  // 创建用户id
+  int64 user_id = 2;
+  // 腾讯云环境id
+  int64 cloud_env_id = 3;
+  // vasp license id
+  int64 vasp_license_id = 4;
+  // 项目名
+  string name = 5;
+  // 项目邀请码
+  string invitation_code = 6;
+  // 项目状态
+  int64 status = 7;
+  // 项目描述
+  string describe = 8;
+  // 项目url链接
+  string link = 9;
+  // 创建时间戳
+  int64 create_at = 10;
+  // 更新时间戳
+  int64 update_at = 11;
+}
+
+// tefs用户部署程序cos路径
+message TefsDeployCosPath {
+   // windows
+   string windows = 1;
+   // mac
+   string mac = 2;
+}
+
+// 用户组织项目
+message UserProject {
+  int64 id = 1;
+  int64 project_id = 2;
+  string project_name = 3;
+  int64 role = 4; // 用户在项目中的角色 1=创建人 2=管理员 3=普通用户
+  int64 create_at = 5; // 用户加入项目时间
+  int64 update_at = 6; // 更新时间
+  string tencentCloudAccount = 7; // 腾讯云账户
+}
+
+// 用户组织
+message UserOrganization {
+  int64 vasp_license_id = 1;
+  string organization = 2;
+  string domain = 3;
+  repeated UserProject organization_project = 4;
+}
+
+// 项目下用户记录
+message ProjectUser {
+  int64 id = 1;
+  int64 user_id = 2;
+  string user_name = 3;
+  int64 project_role = 4;
+  int64 last_login_time = 5;
+  int64 add_project_time = 6;
+}
+
+// 项目申请记录
+message ProjectApply {
+  int64 id = 1;
+  string user_name = 2;
+  string user_phone = 3;
+  string project_name = 4;
+  string details = 5;
+  int64 create_at = 6;
+}
+
+// 实验标签记录
+message Tag {
+  int64 id = 1;
+  string name = 2;
+  string colour = 3;
+}
+
+message Experiment {
+  int64 id = 1;
+  string name = 2;
+  string experiment_type = 3; // 实验类型 vasp
+  string cos_base_path = 4; // 实验的cos基本路径
+  string memo = 5;
+  int64 status = 6; // 状态 1=未实验（草稿） | 2=创建环境 | 3=计算中 | 4=被终止 | 5=失败 | 6=成功
+  int64 is_template = 7; // 1=不是模板 2=模板
+  int64 last_edit_at = 8; // 最后编辑时间
+  int64 compute_node_num = 9; // 计算节点数量
+  string oszicar_json = 10; // oszicarJSON 迭代 能量 算法
+  string image = 11; // 图片
+  string err_msg = 12; // 错误信息
+  int64 start_at = 13; // 计算开始时间
+  int64 done_at = 14; // 计算完成时间
+  int64 create_at = 15; // 记录创建时间
+  int64 update_at = 16; // 记录更新时间
+  string ionicStep = 17; // 离子步
+  string electronStep = 18; // 电子步
+  string energy = 19; // 能量
+  int64 pid = 20; // 实验的父级实验id
+}
+
+
+service Admin {
+    // sms
+    rpc sendSms (sendSmsRequest) returns (sendSmsReply) {}
+
+    // ses 发送邮件验证码
+    rpc sendEmailCode (sendEmailCodeRequest) returns (sendEmailCodeReply) {}
+
+    // cos 下载权限临时密钥
+    rpc getDownloadTmpCredential (getDownloadTmpCredentialRequest) returns (getDownloadTmpCredentialReply) {}
+
+    // 登出
+    rpc loginOut (loginOutRequest) returns (loginOutReply) {}
+
+    // user
+    rpc register (registerRequest) returns (registerReply) {}
+    rpc getUser (getUserRequest) returns (getUserReply) {}
+    rpc getUserList (getUserListRequest) returns (getUserListReply) {}
+    rpc userEdit (userEditRequest) returns (userEditReply) {}
+    rpc resetPhone (resetPhoneRequest) returns (resetPhoneReply) {}
+
+    // 系统配置
+    rpc createSetting (createSettingRequest) returns (createSettingReply) {}
+    rpc updateSetting (updateSettingRequest) returns (updateSettingReply) {}
+    rpc delSetting(delSettingRequest) returns (delSettingReply) {}
+    rpc getSetting(getSettingRequest) returns (getSettingReply) {}
+    rpc getSettingList(getSettingListRequest) returns (getSettingListReply) {}
+
+    // vaspLicense
+    rpc createVaspLicense (createVaspLicenseRequest) returns (createVaspLicenseReply) {}
+    rpc updateVaspLicense (updateVaspLicenseRequest) returns (updateVaspLicenseReply) {}
+    rpc delVaspLicense (delVaspLicenseRequest) returns (delVaspLicenseReply) {}
+    rpc getVaspLicense (getVaspLicenseRequest) returns (getVaspLicenseReply) {}
+    rpc getVaspLicenseList (getVaspLicenseListRequest) returns (getVaspLicenseListReply) {}
+    rpc reviewVaspLicense (reviewVaspLicenseRequest) returns (reviewVaspLicenseReply) {}
+
+    // 用户起服务前创建腾讯云环境相关API，后端服务器只进行数据库操作，真实TKE后端由用户端自动完成。
+    rpc updateCloudEnv (updateCloudEnvRequest) returns (updateCloudEnvReply) {}
+    rpc getCloudEnv (getCloudEnvRequest) returns (getCloudEnvEnvReply) {}
+    rpc getCloudEnvList (getCloudEnvListRequest) returns (getCloudEnvListEnvReply) {}
+
+    // 消息通知
+    // 获取消息列表
+    rpc getNotifyList (getNotifyListRequest) returns (getNotifyListReply) {}
+    // 变更消息状态，未读到已读
+    rpc changeNotifyStatus (changeNotifyStatusRequest) returns (changeNotifyStatusReply) {}
+    // 创建系统通知记录
+    rpc createSystemNotify (createSystemNotifyRequest) returns (createSystemNotifyReply) {}
+    // 删除系统通知记录
+    rpc deleteSystemNotify (deleteSystemNotifyRequest) returns (deleteSystemNotifyReply) {}
+
+    // 项目相关接口
+    rpc getProject (getProjectRequest) returns (getProjectReply) {}
+    rpc getProjectList (getProjectListRequest) returns (getProjectListReply) {}
+    rpc createProject (createProjectRequest) returns (createProjectReply) {}
+    rpc updateProject (updateProjectRequest) returns (updateProjectReply) {}
+    // 获取用户最后操作的项目
+    rpc getLastProject (getLastProjectRequest) returns (getLastProjectReply) {}
+
+    // 部署用户计算任务的web服务
+    rpc deployUserWeb (deployUserWebRequest) returns (deployUserWebReply) {}
+
+    // 用户项目接口
+    rpc getOrganizationList (getOrganizationListRequest) returns (getOrganizationListReply) {}
+    rpc getProjectUserList (getProjectUserListRequest) returns (getProjectUserListReply) {}
+    rpc changeUserProject (changeUserProjectRequest) returns (changeUserProjectReply) {}
+    rpc getUserProjectList (getUserProjectListRequest) returns (getUserProjectListReply) {}
+
+    // 项目申请
+    rpc createProjectApply (CreateProjectApplyRequest) returns (CreateProjectApplyReply) {}
+    rpc reviewProjectApply (reviewProjectApplyRequest) returns (reviewProjectApplyReply) {}
+    rpc getProjectApplyList (getProjectApplyListRequest) returns (getProjectApplyListReply) {}
+
+    // 用户实验标签
+    // 创建标签，限额50，标签名不可重复
+    rpc createTag (createTagRequest) returns (createTagReply) {}
+    rpc getTagList (getTagListRequest) returns (getTagListReply) {}
+
+    // 实验室(项目)
+    // 创建实验
+    rpc createExperiment (createExperimentRequest) returns (createExperimentReply) {}
+    // 实验室的cos临时凭证
+    rpc laboratoryCosCredential (laboratoryCosCredentialRequest) returns (laboratoryCosCredentialReply) {}
+    // 提交实验
+    rpc submitExperiment (submitExperimentRequest) returns (submitExperimentReply) {}
+    // 终止实验
+    rpc terminateExperiment (terminateExperimentRequest) returns (terminateExperimentReply) {}
+    // 获取实验列表
+    rpc getExperimentList (getExperimentListRequest) returns (getExperimentListReply) {}
+    // 获取实验
+    rpc getExperiment (getExperimentRequest) returns (getExperimentReply) {}
+    // 更新实验
+    rpc updateExperiment (updateExperimentRequest) returns (updateExperimentReply) {}
+    // 删除实验
+    rpc deleteExperiment (deleteExperimentRequest) returns (deleteExperimentReply) {}
+    // 获取子实验列表
+    rpc getSubExperimentList (getSubExperimentListRequest) returns (getSubExperimentListReply) {}
+    // 获取实验级别关系
+    rpc getExperimentLevel (getExperimentLevelRequest) returns (getExperimentLevelReply) {}
+    // 获取实验面包线
+    rpc getExperimentBreadLine (getExperimentBreadLineRequest) returns (getExperimentBreadLineReply) {}
+
+    // console shell
+    // 创建console shell服务
+    rpc createShellServer (createShellServerRequest) returns (createShellServerReply) {}
+
+    // chart
+    // 获取用户实验vasprun.xml中数据
+    rpc getChartData (getChartDataRequest) returns (getChartDataReply) {}
+    rpc getImportChartData (getImportChartDataRequest) returns (getImportChartDataReply) {}
+}
+
+// echart服务
+message getImportChartDataRequest{
+  string cosPath = 1; // 数据所在cos桶地址
+}
+message getImportChartDataReply{
+  string poscarData = 1; // poscar数据
+  string energyData = 2; // energy数据
+  string eigenData = 3; // eigen数据
+  string dosData = 4; // dos数据
+}
+
+message getChartDataRequest{
+  int64 experimentId = 1;
+  enum ExType {
+    userEx = 0; // 用戶项目
+    demoEx = 1; // 演示项目
+  }
+  ExType exType = 2;
+  enum DataType {
+    poscar = 0; // 获取poscar数据
+    energy = 1; // 获取energy数据
+    eigen = 2; // 获取eigen数据
+    dos = 3; // 获取dos数据
+  }
+  DataType dataType = 3;
+  // 只有获取energy数据时需要用到key
+  enum Key {
+    e_wo_entrp = 0;
+    e_fr_energy = 1;
+    e_0_energy = 2;
+  }
+  Key key = 4;
+}
+message getChartDataReply{
+  string data = 1;
+}
+
+// 创建console shell服务请求和回应
+message createShellServerRequest{
+  int64 project_id = 1;
+}
+message createShellServerReply{
+  string data = 1;
+}
+
+// 获取实验面包线请求和回应
+message getExperimentBreadLineRequest{
+  int64 experimentId = 1;
+}
+message getExperimentBreadLineReply{
+  string data = 1;
+}
+
+// 获取实验级别关系请求和回应
+message getExperimentLevelRequest{
+  int64 project_id = 1;
+}
+message getExperimentLevelReply{
+  string experimentLevelJson = 1;
+}
+
+// 获取子实验列表请求
+message getSubExperimentListRequest {
+  int64 experiment_pid = 1;
+  int64 project_id =2;
+  int64 offset = 3;
+  int64 limit = 4;
+  repeated string likes = 5; // 关键字
+  enum SearchScope {
+        all = 0; // 搜索全部实验
+        sub = 1; // 搜索子实验
+      }
+  SearchScope search_scope = 6;
+  enum SortField {
+        create_at = 0; // 创建时间排序
+        update_at = 1; // 更新时间排序
+  }
+  SortField sort_field = 7;
+  enum Order {
+        asc = 0; // 正序
+        desc = 1; // 倒序
+  }
+  Order order = 8;
+}
+message getSubExperimentListReply {
+  string subExperimentsJson = 1;
+}
+//message getSubExperimentListReply {
+//  repeated Experiment experimentList = 1;
+//}
+
+// 获取用户最后操作的项目请求和回应
+message getLastProjectRequest {
+}
+message getLastProjectReply {
+  string project_json = 1; // 项目信息json
+}
+
+// 创建系统通知消息记录
+message createSystemNotifyRequest {
+  string title = 1; // 通知标题
+  string content = 2; // 通知内容
+}
+message createSystemNotifyReply {
+  string message = 1;
+}
+
+// 删除系统通知记录
+message deleteSystemNotifyRequest {
+  int64 notify_id = 1;
+}
+message deleteSystemNotifyReply {
+  string message = 1;
+}
+
+// 改变通知状态
+message changeNotifyStatusRequest {
+  int64 notify_id = 1;
+  int64 project_id = 2;
+}
+message changeNotifyStatusReply {
+  string message = 1;
+}
+
+// 删除实验
+message deleteExperimentRequest {
+  int64 experimentId = 1;
+}
+message deleteExperimentReply {
+  string message = 1;
+}
+
+// 更新实验
+message updateExperimentRequest {
+  int64 experimentId = 1;
+  string name = 2;
+  string memo = 3;
+  bool update_last_edit_time = 4;
+  bool clearMemo = 5;
+}
+message updateExperimentReply {
+  string message = 1;
+}
+
+// 获取实验
+message getExperimentRequest {
+  int64 experimentId = 1; // 实验id
+}
+message getExperimentReply {
+  Experiment experiment = 1;
+}
+
+// 获取实验列表
+message getExperimentListRequest {
+  int64 projectId = 1;
+  int64 offset = 2;
+  int64 limit = 3;
+  int64 status = 4; // 0=所有 1=实验中(创建中，计算中) 2=已完成(失败，完成，被终止) 3=草稿 4=模板
+  repeated string likes = 5; // 关键字
+}
+message getExperimentListReply {
+  int64 count = 1; // 所有
+  int64 experimentingCount = 2; // 实验中
+  int64 doneCount = 3; // 完成
+  int64 draftCount = 4; // 草稿
+  int64 templateCount = 5; // 模板
+  repeated Experiment experimentList = 6; // 数据列表
+}
+
+// 终止实验
+message terminateExperimentRequest {
+  int64 experimentId = 1;
+}
+message terminateExperimentReply {
+  string message = 1;
+}
+
+// 提交实验
+message submitExperimentRequest {
+  int64 experimentId = 1;
+  // 计算节点数量
+  int64 computeNodeNum = 2;
+  enum ExperimentType {
+      vasp_std = 0;
+      vasp_gam = 1;
+      vasp_ncl = 2;
+      vasp_2d_std = 3;
+      vasp_2d_gam = 4;
+      vasp_2d_ncl = 5;
+      gpu_vasp_std = 6;
+      gpu_vasp_gam = 7;
+      gpu_vasp_ncl = 8;
+    }
+  ExperimentType experimentType = 3;
+}
+message submitExperimentReply {
+  string message = 1;
+}
+
+// 创建实验
+message createExperimentRequest {
+  int64 projectId = 1;
+  string name = 2;
+  string memo = 3;
+  enum ExperimentType {
+    vasp = 0; // vasp, 默认值
+  }
+  ExperimentType experimentType = 4;
+  int64 pid = 5;
+}
+message createExperimentReply {
+  int64 experimentId = 1;
+  string cosBaseUrl = 2;
+  CosCredential cosCredential = 3;
+}
+
+// 实验室的cos临时凭证
+message laboratoryCosCredentialRequest {
+  enum OpType {
+    upload = 0; // 上传(默认值)
+    download = 1; // 下载
+    delete = 2; //删除
+  }
+  OpType opType = 1;
+  int64 experimentId = 2; // 上传，删除必须
+  int64 copyExperimentId = 3; // copy实验id
+}
+message laboratoryCosCredentialReply {
+  CosCredential cosCredential = 1;
+  string cos_base_url = 2;
+}
+
+// 获取实验标签
+message getTagListRequest {
+  int64 offset = 1;
+  int64 limit = 2;
+}
+message getTagListReply {
+  repeated Tag tags = 1;
+  int64 total = 2;
+}
+
+// 创建实验标签
+message createTagRequest {
+  string name = 1;
+  string colour = 2;
+}
+message createTagReply {
+  string message = 1;
+}
+
+// 项目申请列表
+message getProjectApplyListRequest {
+  int64 offset = 1;
+  int64 limit = 2;
+}
+message getProjectApplyListReply {
+  repeated ProjectApply projectApplyList = 1;
+  int64 total = 2;
+}
+
+// 创建项目申请
+message CreateProjectApplyRequest {
+  string project_invitation_code = 1; // 项目邀请码
+  string details = 2; // 申请详情信息
+}
+message CreateProjectApplyReply {
+  string message = 1;
+}
+
+// 审核项目申请
+message reviewProjectApplyRequest {
+  int64 project_apply_id = 1; // 项目申请记录id
+  enum ReviewRet {
+    reject = 0; // 拒绝
+    accept = 1; // 接受
+    set_admin = 2; // 接受并设置为管理员
+  }
+  ReviewRet review_ret = 2; // 审核结果
+}
+message reviewProjectApplyReply {
+  string message = 1;
+}
+
+// 按用户获取用户项目
+message getUserProjectListRequest {
+  int64 offset = 1;
+  int64 limit = 2;
+}
+message getUserProjectListReply {
+  string response = 1;
+}
+
+// 变更用户项目记录。
+message changeUserProjectRequest {
+  int64 user_project_id = 1;
+  enum Options {
+    disable = 0; // 禁用用户
+    role_change_admin = 1; // 角色变更为管理员
+    role_change_common = 2; // 角色变更为普通用户
+  }
+  Options options = 2; // 变更选项
+}
+message changeUserProjectReply {
+  string message = 1;
+}
+
+// 获取项目下用户成员
+message getProjectUserListRequest {
+  int64 project_id = 1;
+  int64 offset = 2;
+  int64 limit = 3;
+  enum SortField {
+    name = 0; // 账户名称,默认值
+    role = 1; // 项目角色权限
+    last_login_at = 2; // 上次登录时间
+    create_at = 3; // 加入项目时间
+  }
+  SortField sortField = 4; // 排序规则
+  enum Sort {
+    ASC = 0; // 升序，默认值
+    DESC = 1; // 降序
+  }
+  Sort sort = 5; // 升序或者降序
+}
+message getProjectUserListReply{
+  repeated ProjectUser projectUser = 1;
+  int64 total = 2;
+}
+
+// 根据用户所在项目，反推获取用户组织
+message getOrganizationListRequest {
+}
+message getOrganizationListReply {
+  repeated UserOrganization userOrganization = 1;
+  User user = 2;
+}
+
+// 部署用户计算任务的web服务
+message deployUserWebRequest {
+  int64 cloud_env_id = 1;
+  int64 project_id = 2;
+}
+message deployUserWebReply {
+  string message = 1;
+}
+
+// 获取项目
+message getProjectRequest {
+  int64 id = 1;
+}
+message getProjectReply {
+  Project project = 1;
+}
+
+// 获取项目列表
+message getProjectListRequest {
+  int64 offset = 1;
+  int64 limit = 2;
+  // 项目状态 1=创建中 | 2=创建失败  | 3=创建完成 | 不传查询所有
+  int64 status = 3;
+}
+message getProjectListReply {
+  repeated Project projectList = 1;
+  int64 total = 2;
+}
+
+// 添加项目
+message createProjectRequest {
+  int64 vasp_license_id = 1;
+  string cloud_secret_id = 2;
+  string cloud_app_id = 3;
+  string name = 4;
+  string describe = 5;
+}
+message createProjectReply {
+  string message = 1;
+  Project project = 2;
+  // 根据返回腾讯云环境状态(cloudEnv.status < 3)判断是否请求本地创建腾讯云环境的应用程序
+  CloudEnv cloudEnv = 3;
+}
+
+// 更新项目
+message updateProjectRequest {
+  int64 id = 1;
+  string new_name = 2;
+  string new_describe = 3;
+}
+message updateProjectReply {
+  string message = 1;
+}
+
+// 获取消息列表
+message getNotifyListRequest {
+  int64 offset = 1;
+  int64 limit = 2;
+  //int64 project_id = 3; // 项目id
+  //enum Status {
+  //    ALL = 0; // 全部，默认值
+  //    UNREAD = 1; // 未读
+  //    READ = 2; // 已读
+  //  }
+  //Status status = 5; // 全部 已读 未读
+}
+message getNotifyListReply {
+  string response = 1;
+}
+
+// 登出
+message loginOutRequest {
+}
+message loginOutReply {
+  string message = 1;
+}
+
+// 发送邮件验证码
+message sendEmailCodeRequest {
+  string email = 1;
+}
+message sendEmailCodeReply {
+  string message = 1;
+}
+
+// 更新数据库的腾讯云环境信息
+message updateCloudEnvRequest {
+  int64 id = 1;
+  string region = 2;
+  string zone = 3;
+  string cloud_account_id = 4;
+  string cloud_project_id = 5;
+  string vpc_id = 6;
+  string subnet_id = 7;
+  string security_group_id = 8;
+  string cos_bucket = 9;
+  string cluster_id = 10;
+  string instance_id = 11;
+  string instance_ip = 12;
+  string err_msg = 13;
+}
+message updateCloudEnvReply {
+  string message = 1;
+}
+
+// 获取cloudEnv
+message getCloudEnvRequest {
+  int64 id = 1;
+}
+message getCloudEnvEnvReply {
+  CloudEnv cloudEnv = 1;
+}
+
+// 获取cloudEnvList
+message getCloudEnvListRequest {
+  int64 offset = 1;
+  int64 limit = 2;
+  int64 status = 3; // cloudEnv 状态 0=所有 | 1=创建中 | 2=创建失败 | 3=创建成功
+}
+message getCloudEnvListEnvReply {
+  repeated CloudEnv cloudEnv = 1;
+  int64 total = 2;
+}
+
+// 审核vaspLicense
+message reviewVaspLicenseRequest {
+  int64 id = 1;
+  int64 review_ret = 2; // 审核结果  2=失败 | 3=成功
+}
+message reviewVaspLicenseReply {
+  string message = 1;
+}
+
+// 查询vaspLicense列表
+message getVaspLicenseListRequest {
+  int64 offset = 1;
+  int64 limit = 2;
+  int64 status = 3; // license状态 0=所有 | 1=待审核 | 2=失败 | 3=成功
+}
+message getVaspLicenseListReply {
+  repeated License license = 1;
+  int64 total = 2;
+}
+
+// 查询vaspLicense
+message getVaspLicenseRequest {
+  int64 id = 1;
+}
+message getVaspLicenseReply {
+  License license = 1;
+  repeated string images = 2;
+}
+
+// 删除vaspLicense,只有审核未通过license才可删除。
+message delVaspLicenseRequest {
+  int64 id = 1;
+}
+message delVaspLicenseReply {
+  string message = 2;
+}
+
+// 更新vaspLicense
+message updateVaspLicenseRequest {
+  int64 id = 1;
+  string domain = 2;
+  string details = 3;
+}
+message updateVaspLicenseReply {
+  string message = 1;
+}
+
+// 创建vaspLicense, op_type=1,获取上传cos权限。op_type=2,创建记录
+message createVaspLicenseRequest {
+  string organization = 1;
+  string domain = 2;
+  string bind_email = 3;
+  int64 op_type = 4; // 操作类型, 1=获取cos上传临时密钥和路径 | 2=记录生成
+  int64 license_dir_num = 5; // vaspLicense在cos的文件夹子目录
+  int64 email_code = 6; // 邮箱验证码
+}
+message createVaspLicenseReply {
+  string message = 1;
+  repeated string uploadPath = 2;
+  CosCredential credential = 3;
+}
+
+// 添加系统配置
+message createSettingRequest {
+  string key = 1;
+  string value = 2;
+  string describe = 3;
+}
+message createSettingReply {
+  string message = 1;
+}
+
+// 更新系统配置
+message updateSettingRequest {
+  int64 id = 1;
+  string value = 2;
+  string describe = 3;
+}
+message updateSettingReply {
+  string message = 1;
+}
+
+// 删除系统配置
+message delSettingRequest {
+  int64 id = 1;
+}
+message delSettingReply {
+  string message = 1;
+}
+
+// 获取系统配置
+message getSettingRequest {
+  int64 id = 1;
+}
+message getSettingReply {
+  Setting setting = 2;
+}
+
+// 获取系统配置列表
+message getSettingListRequest {
+  int64 offset = 1;
+  int64 limit = 2;
+}
+message getSettingListReply {
+  repeated Setting setting = 2;
+  int64 total = 3;
+}
+
+// 获取cos文件下载权限
+message getDownloadTmpCredentialRequest{
+    int64 op_type = 1; // 操作类型 1=获取cos用户文件下载权限 | 2=获取tefs部署应用程序下载权限 | 3=上传Echar临时文件
+}
+message getDownloadTmpCredentialReply {
+  CosCredential credential = 1;
+  TefsDeployCosPath tefsDeployCosPath = 2;
+}
+
+message sendSmsRequest {
+  string phone = 1;
+  int64  type = 2; // 发送短信类型 1=注册 | 2=用户修改资料手机号
+}
+message sendSmsReply {
+  string message = 1;
+}
+
+message registerRequest {
+  string phone = 1;
+  string email = 2;
+  string sms_code = 3;
+  string name = 4;
+}
+message registerReply {
+  string message = 2;
+}
+
+message getUserRequest {
+}
+message getUserReply {
+  User user = 1;
+}
+
+message userEditRequest {
+  string email = 1;
+  string name = 2;
+  int64 is_notify = 3; // 1=通知 2=不通知
+  string agreement_version = 4; // 同意的用户协议版本
+}
+message userEditReply {
+  string message = 1;
+}
+
+message resetPhoneRequest {
+  string phone = 1;
+  string sms_code = 2;
+  string new_phone = 3;
+  string new_sms_code = 4;
+  int64 type = 5; // 1=验证旧手机验证码(参数phone,sms_code) | 2=设置新手机号(所以参数)
+}
+message resetPhoneReply {
+  string message = 1;
+}
+
+message getUserListRequest {
+  int64 offset = 1;
+  int64 limit = 2;
+}
+message getUserListReply {
+  repeated User users = 1;
+  int64 total = 2;
+}

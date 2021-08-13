@@ -1,0 +1,49 @@
+FROM ubuntu:18.04
+
+# 安装tectonic所需依赖
+RUN sed -i 's/archive.ubuntu.com/mirrors.cloud.tencent.com/g' /etc/apt/sources.list \
+    && sed -i 's/security.ubuntu.com/mirrors.cloud.tencent.com/g' /etc/apt/sources.list \
+    && apt-get clean && apt-get update \
+    && apt-get install curl tzdata -y \
+    && cp -r -f /usr/share/zoneinfo/Hongkong /etc/localtime \
+    && echo -ne "Ubuntu Linux 18.04 image. (`uname -rsv`)\n" >> /root/.built \
+    && apt-get install ca-certificates \
+    && apt-get install libfontconfig1-dev libgraphite2-dev libharfbuzz-dev libicu-dev libssl-dev zlib1g-dev -y
+
+# cargo安装脚本
+WORKDIR /tmp
+RUN curl https://sh.rustup.rs -sSf > rustup.sh \
+    && chmod 755 rustup.sh \
+    && ./rustup.sh -y \
+    && rm /tmp/rustup.sh
+
+# cargo下载源
+RUN touch /root/.cargo/config \
+    && echo [source.crates-io]\\n \
+    registry = \"https://github.com/rust-lang/crates.io-index\"\\n \
+    replace-with = \'sjtu\'\\n \
+    [source.tuna]\\n \
+    registry = \"https://mirrors.tuna.tsinghua.edu.cn/git/crates.io-index.git\"\\n \
+    [source.ustc]\\n \
+    registry = \"git://mirrors.ustc.edu.cn/crates.io-index\"\\n \
+    [source.sjtu]\\n \
+    registry = \"https://mirrors.sjtug.sjtu.edu.cn/git/crates.io-index\"\\n \
+    [source.rustcc]\\n \
+    registry = \"https://code.aliyun.com/rustcc/crates.io-index.git\"\\n >> /root/.cargo/config
+
+# cargo安装tectonic
+WORKDIR /root/.cargo/bin
+RUN ./cargo install tectonic \
+    && cp -r tectonic /bin/
+
+# 安装中文字体
+RUN apt-get -y install fontconfig xfonts-utils
+
+# 使用该Dockerfile创建镜像的时候，需要先将fonts字体文件夹复制到当前Dockerfile目录下
+WORKDIR /usr/share/fonts/chinese
+COPY ./fonts .
+
+# 生成字库索引信息，更新缓存
+RUN mkfontscale \
+    && mkfontdir \
+    && fc-cache

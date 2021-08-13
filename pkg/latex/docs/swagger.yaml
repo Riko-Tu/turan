@@ -1,0 +1,884 @@
+basePath: /api/doc
+info:
+  contact:
+    email: support@bullteam.cn
+    name: API Support
+  description: TEFS latex
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: TEFS latex API
+  version: V0.1
+paths:
+  /latex:
+    get:
+      consumes:
+      - application/json
+      description: 获取latex列表
+      parameters:
+      - description: 状态 1=正常 2=归档 3=删除
+        in: query
+        name: status
+        required: true
+        type: integer
+      - description: 从第多少条起始
+        in: query
+        name: offset
+        required: true
+        type: integer
+      - description: 获取条数
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - description: 创建时间 create_at; 最后更新时间update_at; 当前用户操作时间current_user_operation_time;
+        in: query
+        name: sort_field
+        required: true
+        type: string
+      - description: asc升序 desc降序
+        in: query
+        name: sort
+        required: true
+        type: string
+      - description: latex文档ID(非必填项)
+        in: query
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 获取latex列表
+      tags:
+      - latex
+    post:
+      consumes:
+      - application/json
+      description: 创建latex
+      parameters:
+      - description: latex 名字
+        in: query
+        name: name
+        type: string
+      - description: 创建latex类型 1=空白创建(只会生成main.txt文件);2=样例创建;3=上传创建(zip文件);4=模板创建
+        in: query
+        name: create_latex_type
+        required: true
+        type: string
+      - description: create_latex_type=3(上传创建)时的zip文件(只支持zip文件)。
+        in: formData
+        name: zip_file
+        type: file
+      - description: create_latex_type=4(模板创建)时的模板名称
+        in: query
+        name: template_name
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 创建latex
+      tags:
+      - latex
+    put:
+      consumes:
+      - application/json
+      description: latex批量修改,单个修改(归档,丢弃到垃圾桶,删除)
+      parameters:
+      - description: latex ID列表(只要option=3的时 并且该latex为用户创建时,需要此参数)，以,分隔 例如 1,2,3
+        in: query
+        name: latex_ids
+        type: string
+      - description: user latex ID列表，以,分隔 例如 1,2,3 (只要option=3的时, 并且该latex不是用户创建，放入此参数。表示用户要离开该latex)
+        in: query
+        name: user_latex_ids
+        type: string
+      - description: 1=恢复到正常状态;2=归档;3=丢弃到回收站;4=删除
+        in: query
+        name: option
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: latex批量修改,单个修改(归档,丢弃到垃圾桶,删除)
+      tags:
+      - latex
+  /latex/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 删除latex
+      parameters:
+      - description: latex ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 删除latex
+      tags:
+      - latex
+    put:
+      consumes:
+      - application/json
+      description: 修改latex
+      parameters:
+      - description: latex ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: latex 名字
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 修改latex
+      tags:
+      - latex
+  /latex/{id}/config:
+    get:
+      consumes:
+      - application/json
+      description: 获取latex配置信息
+      parameters:
+      - description: latex ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 获取latex配置信息
+      tags:
+      - latex
+    put:
+      consumes:
+      - application/json
+      description: 修改latex配置信息
+      parameters:
+      - description: latex ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 编译文件路径
+        in: query
+        name: main_document
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 修改latex配置信息
+      tags:
+      - latex
+  /latex/{id}/file:
+    post:
+      consumes:
+      - application/json
+      description: latex文件操作
+      parameters:
+      - description: latex ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 操作类型 upload:上传文件, download:下载文件, delete:删除, create:创建, rename:重命名
+        in: query
+        name: option
+        required: true
+        type: string
+      - description: 要操作的文件
+        in: formData
+        name: file
+        type: file
+      - description: '文件或目录,如果在某个目录下填写完整路径,如果最外层目录填 / '
+        in: query
+        name: path
+        required: true
+        type: string
+      - description: 当option=create需要此参数，dir:创建目录，file创建文件夹
+        in: query
+        name: create_type
+        type: string
+      - description: 当option=rename需要此参数，目录或文件的新名字,最多30个字符
+        in: query
+        name: new_name
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: latex文件操作
+      tags:
+      - latex
+  /latex/{id}/mv:
+    get:
+      consumes:
+      - application/json
+      description: 移动latex文件或目录
+      parameters:
+      - description: latex ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 源路径
+        in: query
+        name: source_path
+        required: true
+        type: string
+      - description: 目标路径
+        in: query
+        name: target_path
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 移动latex文件或目录
+      tags:
+      - latex
+  /latex/{id}/pdf:
+    post:
+      consumes:
+      - application/json
+      description: 编译latex
+      parameters:
+      - description: latex ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: latex 编译文件路径, 例如/main.tex(最外层目录)，/test/main.tex(test目录下文件)
+        in: query
+        name: filepath
+        required: true
+        type: string
+      - description: 试试保存log文件
+        in: query
+        name: keep_logs
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 编译latex
+      tags:
+      - latex
+  /latex/{id}/share:
+    delete:
+      consumes:
+      - application/json
+      description: 根据user_id和latex_id移除文档协作者
+      parameters:
+      - description: latex ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: user ID
+        in: query
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 移除文档协作者
+      tags:
+      - share
+    get:
+      consumes:
+      - application/json
+      description: 根据latex_id查看当前latex文档协作者情况
+      parameters:
+      - description: latex ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 查询文档协作者列表
+      tags:
+      - share
+    post:
+      consumes:
+      - application/json
+      description: 邮件发送latex协作邀请URL
+      parameters:
+      - description: latex ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 目标用户邮箱
+        in: query
+        name: targetEmail
+        required: true
+        type: string
+      - description: 权限：1=读写 2=只读
+        in: query
+        name: power
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 邮件发送latex协作邀请URL
+      tags:
+      - share
+    put:
+      consumes:
+      - application/json
+      description: 根据user_id和latex_id修改文档协作者权限
+      parameters:
+      - description: user_id
+        in: query
+        name: user_id
+        required: true
+        type: integer
+      - description: latex_id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 权限 1=读写 2=只读
+        in: query
+        name: power
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 修改文档协作者权限
+      tags:
+      - share
+  /latex/{id}/tree:
+    get:
+      consumes:
+      - application/json
+      description: 获取latex目录树
+      parameters:
+      - description: latex ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 获取latex目录树
+      tags:
+      - latex
+  /latex_templates:
+    get:
+      consumes:
+      - application/json
+      description: 获取latex模板
+      parameters:
+      - description: 从多少条开始
+        in: query
+        name: offset
+        required: true
+        type: integer
+      - description: 返回的条数
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - description: 获取模板类型：paper=论文模板，notes=笔记模板
+        in: query
+        name: type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 获取latex模板
+      tags:
+      - template
+    post:
+      consumes:
+      - application/json
+      description: 上传latex模板(需要管理员权限)
+      parameters:
+      - description: 模板作者
+        in: query
+        name: author
+        required: true
+        type: string
+      - description: 模板license
+        in: query
+        name: license
+        required: true
+        type: string
+      - description: 模板摘要
+        in: query
+        name: abstract
+        required: true
+        type: string
+      - description: 模板封面图
+        in: formData
+        name: image
+        required: true
+        type: file
+      - description: 要操作的文件
+        in: formData
+        name: file
+        required: true
+        type: file
+      - description: 上传模板类型：paper=论文模板，notes=笔记模板
+        in: query
+        name: type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 上传latex模板(需要管理员权限)
+      tags:
+      - template
+  /latex_templates/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 删除latex模板(需要管理员权限)
+      parameters:
+      - description: 要操作的文件
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 删除latex模板(需要管理员权限)
+      tags:
+      - template
+    put:
+      consumes:
+      - application/json
+      description: 更新latex模板(需要管理员权限)
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 模板作者
+        in: query
+        name: author
+        type: string
+      - description: 模板license
+        in: query
+        name: license
+        type: string
+      - description: 模板摘要
+        in: query
+        name: abstract
+        type: string
+      - description: 模板封面图
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 更新latex模板(需要管理员权限)
+      tags:
+      - template
+  /share:
+    get:
+      consumes:
+      - application/json
+      description: 根据latex_id查看当前latex文档邮件分享待处理情况
+      parameters:
+      - description: latex_id
+        in: query
+        name: id
+        required: true
+        type: integer
+      - description: 从多少条开始
+        in: query
+        name: offset
+        required: true
+        type: integer
+      - description: 返回的条数
+        in: query
+        name: limit
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 查询文档分享URL待处理列表
+      tags:
+      - share
+    post:
+      consumes:
+      - application/json
+      description: 根据URL中的key获取latex进行协作
+      parameters:
+      - description: 分享latex的url中的key
+        in: query
+        name: key
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 根据URL中的key获取latex进行协作
+      tags:
+      - share
+  /share/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 根据share_id删除当前文档分享URL
+      parameters:
+      - description: share ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 删除文档分享URL，取消分享
+      tags:
+      - share
+  /tag:
+    get:
+      consumes:
+      - application/json
+      description: 获取tag列表
+      parameters:
+      - description: 偏移量
+        in: query
+        name: offset
+        required: true
+        type: integer
+      - description: 条数
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - description: 名字 name; 创建时间create_at
+        in: query
+        name: sort_field
+        required: true
+        type: string
+      - description: asc升序 desc降序
+        in: query
+        name: sort
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 获取tag列表
+      tags:
+      - tag
+    post:
+      consumes:
+      - application/json
+      description: 创建tag
+      parameters:
+      - description: tag  名字
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 创建tag
+      tags:
+      - tag
+  /tag/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 删除tag
+      parameters:
+      - description: tag ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 删除tag
+      tags:
+      - tag
+    put:
+      consumes:
+      - application/json
+      description: 修改tag
+      parameters:
+      - description: tag ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 名字
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 修改tag
+      tags:
+      - tag
+  /tag/{id}/latex/{latex_id}:
+    delete:
+      consumes:
+      - application/json
+      description: tag添加latex
+      parameters:
+      - description: tag ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: latex ID
+        in: path
+        name: latex_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: latex删除tag
+      tags:
+      - latexTag
+    post:
+      consumes:
+      - application/json
+      description: tag添加latex
+      parameters:
+      - description: tag ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: latex ID
+        in: path
+        name: latex_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: latex添加tag
+      tags:
+      - latexTag
+  /zips:
+    get:
+      consumes:
+      - application/json
+      description: 下载latex zips
+      parameters:
+      - description: 需要下载的latex ID 可多个，例如1,2,3
+        in: query
+        name: latex_ids
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 下载latex zips
+      tags:
+      - latex
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

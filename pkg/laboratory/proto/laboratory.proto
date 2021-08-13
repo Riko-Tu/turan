@@ -1,0 +1,260 @@
+// Copyright 2015 gRPC authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+option go_package = ".;laboratory";
+package laboratory;
+
+// COS秘钥(临时)
+message CosCredential {
+  // COS服务返回的临时ID
+  string tmpSecretID = 1;
+  // COS服务返回的临时Key
+  string tmpSecretKey = 2;
+  // COS服务返回的Token
+  string sessionToken = 3;
+  // 存储桶名,不含子目录，不含http：//或者cos：// url
+  string bucket = 4;
+  string region = 5;
+  // ExpiredTime
+  int64 expired_time = 6;
+  // Expiration
+  string expiration = 7;
+  // StartTime
+  int64 start_time = 8;
+}
+
+service Laboratory {
+    // 获取cos临时秘钥,上传指定固定文件路径，下载给定范围，删除，所有权限
+    rpc getCosTmpSecret (getCosTmpSecretRequest) returns (getCosTmpSecretReply) {}
+    rpc getCosUploadTmpSecret (getCosUploadTmpSecretRequest) returns (getCosUploadTmpSecretReply) {}
+    rpc getCosDownloadTmpSecret (getCosDownloadTmpSecretRequest) returns (getCosDownloadTmpSecretReply) {}
+    rpc getCosDeleteTmpSecret (getCosDeleteTmpSecretRequest) returns (getCosDeleteTmpSecretReply) {}
+
+    // 创建实验环境
+    rpc createExperimentEnv (createExperimentEnvRequest) returns (createExperimentEnvReply) {}
+
+    // 查询实验环境
+    rpc queryExperimentEnv (queryExperimentEnvRequest) returns (queryExperimentEnvReply) {}
+
+    // 查询实验环境列表
+    rpc queryExperimentEnvList (queryExperimentEnvListRequest) returns (queryExperimentEnvListReply) {}
+
+    // 删除实验环境
+    rpc deleteExperimentEnv (deleteExperimentEnvRequest) returns (deleteExperimentEnvReply) {}
+
+    // 提交实验
+    rpc submitExperiment (submitExperimentRequest) returns (submitExperimentReply) {}
+
+    // 终止实验
+    rpc terminateExperiment (terminateExperimentRequest) returns (terminateExperimentReply) {}
+
+    // 查询实验详情
+    rpc queryExperiment (queryExperimentRequest) returns (queryExperimentReply) {}
+
+    // 删除实验
+    rpc deleteExperiment (deleteExperimentRequest) returns (deleteExperimentReply) {}
+
+    // cvm详情列表
+    rpc getCvmList (getCvmListRequest) returns (getCvmListReply) {}
+
+    // cmv可用zone列表
+    rpc availableZoneList (availableZoneListRequest) returns (availableZoneListReply) {}
+
+    // 按cmvImageId 查询 cmvImage
+    rpc cvmImage (cvmImageRequest) returns (cvmImageReply) {}
+
+    // 创建web console docker容器
+    rpc createWebConsole (createWebConsoleRequest) returns (createWebConsoleReply) {}
+}
+
+// 创建web console docker容器
+message createWebConsoleRequest {
+  int64 userId = 1;
+  int64 projectId = 2;
+  string secret = 3;
+  string tefsUrl = 4;
+}
+message createWebConsoleReply {
+  string message = 1;
+}
+
+// (getCosTmpSecretRequest) returns (getCosTmpSecretReply)
+message getCosTmpSecretRequest {
+  string cosPath = 1;
+}
+message getCosTmpSecretReply {
+  CosCredential cosCredential = 1;
+  string cosBaseUrl = 2;
+}
+
+// 获取删除cos实验文件临时权限，附带查询权限
+message getCosDeleteTmpSecretRequest {
+  int64 userId = 1;
+  int64 experimentId = 2;
+}
+message getCosDeleteTmpSecretReply {
+  CosCredential cosCredential = 1;
+  string cosBaseUrl = 2;
+}
+
+// 查询实验环境列表
+message queryExperimentEnvListRequest {
+  uint64 offset = 1;
+  uint64 limit = 2;
+}
+message queryExperimentEnvListReply {
+  string jsonResponse = 1;
+}
+
+// 按cmvImageId 查询 cmvImage
+message cvmImageRequest {
+  string cvmImageId = 1;
+}
+message cvmImageReply {
+  string responseJson = 1;
+  // 腾讯云账户
+  string cloudAccount = 2;
+}
+
+// cmv可以zone列表
+message availableZoneListRequest {
+}
+message availableZoneListReply {
+  repeated string zoneList = 1;
+}
+
+// 获取cvm详情列表
+message getCvmListRequest {
+  int64 offset = 1;
+  int64 limit = 2;
+  string zone = 3;
+}
+message getCvmListReply {
+  // cvm list 详情
+  string describeCvmListJson = 1;
+}
+
+// 删除计算环境请求和回复
+message deleteExperimentEnvRequest {
+  // 批量计算环境id
+  string batchEnvId = 1;
+}
+message deleteExperimentEnvReply {
+  string message = 1;
+}
+
+// 查询实验环境请求和回复
+message queryExperimentEnvRequest {
+  // 批量计算环境id
+  string batchEnvId = 1;
+}
+message queryExperimentEnvReply {
+  // 批量计算环境详情json
+  string describeEnvJson = 1;
+}
+
+// 创建实验环境请求和回复
+message createExperimentEnvRequest {
+  // cvm镜像id
+  string cvmImageId = 1;
+  // 节点数量
+  int64 nodeNum = 2;
+  // 输入文件cos路径
+  string inputCosPath = 3;
+  string zone = 4;
+  // cvm实例类型
+  string instanceType = 5;
+  // 云硬盘类型
+  string diskType = 6;
+  // 云硬盘size
+  int64 diskSize = 7;
+}
+message createExperimentEnvReply {
+  // 批量计算环境id
+  string envId = 1;
+}
+
+// 删除实验请求和回复
+message deleteExperimentRequest {
+  string jid = 1;
+}
+message deleteExperimentReply {
+  string message = 1;
+}
+
+// 查询实验详情请求和回复
+message queryExperimentRequest {
+  string jid = 1;
+}
+message queryExperimentReply {
+  string jobDetailsJson = 1;
+}
+
+// 终止实验请求和回复
+message terminateExperimentRequest {
+  // batch compute 任务id
+  string jid = 1;
+}
+message terminateExperimentReply {
+   string message = 1;
+}
+
+// 提交实验
+message submitExperimentRequest {
+  // 运行指令(base64编码)
+  string b64RunCmd = 1;
+  // 实验名称
+  string name = 2;
+  // 实验描述
+  string description = 3;
+  // 计算任务的超时时间
+  uint64 timeout = 4;
+  // cos实验文件保存基本路径
+  string cosPath = 5;
+  // 批量计算环境id
+  string batchEnvId = 6;
+  string zone = 7;
+}
+message submitExperimentReply {
+  string jid = 1;
+}
+
+// 获取cos上传临时秘钥
+message getCosUploadTmpSecretRequest {
+  enum OpType {
+    experiment = 0; // 实验,默认值
+  }
+  OpType opType = 1;
+  string experimentDir = 2; // 实验文件在cos的文件夹，如果op_type=experiment,此参数必须
+  string copyExperimentDir = 3; // copy实验时实验
+}
+message getCosUploadTmpSecretReply {
+  CosCredential cosCredential = 1;
+  string cosBaseUrl = 2;
+}
+
+// 获取cos下载临时秘钥
+message getCosDownloadTmpSecretRequest {
+  int64 userId = 1;
+}
+message getCosDownloadTmpSecretReply {
+  CosCredential cosCredential = 1;
+  string cosBaseUrl = 2;
+}
+
+
+
+
