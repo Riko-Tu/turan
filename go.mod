@@ -13,7 +13,6 @@ require (
 	github.com/desertbit/timer v0.0.0-20180107155436-c41aec40b27f // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fastly/go-utils v0.0.0-20180712184237-d95a45783239 // indirect
-	github.com/fatih/structs v1.1.0
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-basic/uuid v1.0.0
@@ -39,11 +38,8 @@ require (
 	github.com/tencentcloud/tencentcloud-sdk-go v3.0.233+incompatible
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.7
 	github.com/tencentyun/qcloud-cos-sts-sdk v0.0.0-20200824080740-0ac0cb832d5a
-	github.com/urfave/cli v1.22.4
-	github.com/urfave/cli/v2 v2.3.0
-	github.com/yudai/hcl v0.0.0-20151013225006-5fa2393b3552
 	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897
-	golang.org/x/net v0.0.0-20210324205630-d1beb07c2056
+	golang.org/x/net v0.0.0-20210324205630-d1beb07c2056 // indirect
 	golang.org/x/text v0.3.5 // indirect
 	google.golang.org/grpc v1.33.0
 	google.golang.org/protobuf v1.25.0
