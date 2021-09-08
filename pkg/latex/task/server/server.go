@@ -25,7 +25,7 @@ func setup() {
 		panic(fmt.Sprintf("Parse config file fail: %s", err.Error()))
 	}
 	database.Setup()
-	cache.LatexSetup()
+	cache.Setup()
 	task.Setup()
 	zerolog.SetGlobalLevel(zerolog.Level(0))
 	log.Setup()
